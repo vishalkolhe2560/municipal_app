@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_login">e-Municipal Services - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(180deg, #64a8ff, #e3f2fd);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 350px;
+            background: #f5f8ff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: 24px;
+            color: #1a4fb3;
+        }
+
+        .tagline {
+            color: #4f6fa5;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #cfd9ff;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 15px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #144db8;
+        }
+
+        .link {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #1a5fe0;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .or {
+            margin: 15px 0;
+            font-size: 13px;
+            color: #7a8db8;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #7a8db8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <img src="logo.jpg" class="logo">
+
+        <h1 data-i18n="header_main">e-Municipal Services</h1>
+        <div class="tagline" data-i18n="tagline">Fast • Transparent • Digital</div>
+
+        <select id="role" class="input-box" onchange="updatePlaceholder()">
+            <option value="citizen" data-i18n="role_citizen">Citizen</option>
+            <option value="officer" data-i18n="role_officer">Officer / Admin</option>
+        </select>
+
+        <input type="text" id="mobile" class="input-box" placeholder="Mobile Number" data-i18n="placeholder_mobile">
+        <input type="password" id="password" class="input-box" placeholder="Password" data-i18n="placeholder_password">
+
+        <button class="btn" onclick="login()" data-i18n="btn_login">LOGIN</button>
+
+        <a href="forgot_password.html" class="link" data-i18n="link_forgot">Forgot Password?</a>
+
+        <div class="or" data-i18n="text_or">OR</div>
+
+        <button class="btn" style="background:#ffffff;color:#1a5fe0;border:2px solid #1a5fe0;" onclick="goRegister()"
+            data-i18n="btn_register_new">
+            REGISTER NEW USER
+        </button>
+
+        <div class="footer" data-i18n="footer_powered">
+            Powered by Digital Municipality Initiative
+        </div>
+    </div>
+    <script src="translations.js"></script>
+    <script>
+
+        function updatePlaceholder() {
+            const role = document.getElementById('role').value;
+            const input = document.getElementById('mobile');
+            // Use translation for placeholder update
+            if (role === 'citizen') {
+                input.placeholder = getTranslation('placeholder_mobile');
+            } else {
+                input.placeholder = getTranslation('placeholder_username');
+            }
+        }
+
+        function login() {
+            const role = document.getElementById('role').value;
+            const mobile = document.getElementById('mobile').value;
+            const pass = document.getElementById('password').value;
+
+            if (role === 'citizen') {
+                // Citizen Login
+                fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mobile, password: pass })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            localStorage.setItem('user', JSON.stringify(data.user));
+                            window.location.href = "dashboard.html";
+                        } else {
+                            alert("Invalid Credentials");
+                        }
+                    })
+                    .catch(err => alert("Server Error"));
+            } else {
+                // Officer Login
+                fetch("/officer/login", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: mobile, password: pass })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.role === 'ADMIN') {
+                                window.location.href = "admin_dashboard.html";
+                            } else {
+                                // Store officer data for dashboard use
+                                localStorage.setItem('officer', JSON.stringify(data.user));
+                                window.location.href = "officer_dashboard.html";
+                            }
+                        } else {
+                            alert("Invalid Credentials");
+                        }
+                    })
+                    .catch(err => alert("Server Error"));
+            }
+        }
+
+
+        function goRegister() {
+            window.location.href = "register.html";
+        }
+
+    </script>
+</body>
+
+</html>

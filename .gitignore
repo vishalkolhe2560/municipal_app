@@ -1,0 +1,8 @@
+node_modules/
+uploads/
+*.log
+.env
+users.json
+applications.json
+officers.json
+migrate_data.js

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_birth">Birth Certificate Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1a5fe0;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #144db8;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 data-i18n="header_birth">Apply Birth Certificate</h1>
+        <form id="birthForm">
+            <label data-i18n="label_child_name">Child Name</label>
+            <input type="text" name="childName" required>
+
+            <label data-i18n="label_dob">Date of Birth</label>
+            <input type="date" name="dob" required>
+
+            <label data-i18n="label_pob">Place of Birth</label>
+            <input type="text" name="placeOfBirth" required>
+
+            <label data-i18n="label_father_name">Father's Name</label>
+            <input type="text" name="fatherName" required>
+
+            <label data-i18n="label_mother_name">Mother's Name</label>
+            <input type="text" name="motherName" required>
+
+            <label data-i18n="label_proof_birth">Proof of Birth (Hospital Record)</label>
+            <input type="file" name="document" required accept=".pdf,.jpg,.jpeg,.png">
+
+            <button type="submit" class="btn" data-i18n="btn_submit_app">Submit Application</button>
+        </form>
+        <a href="dashboard.html" class="back" data-i18n="link_back_dashboard">Back to Dashboard</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        document.getElementById('birthForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Append User Mobile if logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.mobile) {
+                formData.append('mobile', user.mobile);
+            }
+
+            try {
+                const response = await fetch('/apply-birth', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Application Submitted Successfully! Application ID: ' + result.applicationId);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Server Error');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

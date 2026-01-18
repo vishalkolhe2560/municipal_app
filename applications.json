@@ -1,0 +1,222 @@
+[
+  {
+    "applicationId": "BIRTH-1768661005326",
+    "type": "BIRTH",
+    "data": {
+      "childName": "Shambhu",
+      "dob": "2025-11-01",
+      "placeOfBirth": "Sangamner",
+      "fatherName": "Vishal",
+      "motherName": "Swati"
+    },
+    "file": "1768661005316-Swati mscit.pdf",
+    "status": "APPROVED",
+    "date": "2026-01-17T14:43:25.326Z",
+    "remark": "आधार कार्ड लागेल ",
+    "certificateFile": "1768661910398-home page.jpg"
+  },
+  {
+    "applicationId": "GRV-1768665126303",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "स्वाती कोल्हे ",
+      "department": "Roads",
+      "description": "रस्त्यावर खूप खड्डे आहेत ",
+      "address": "गणेशनगर "
+    },
+    "file": "1768665126295-swatiaadhar.jpg",
+    "status": "REJECTED",
+    "date": "2026-01-17T15:52:06.303Z",
+    "remark": "road are now pot hole free",
+    "certificateFile": "1768665308014-WhatsApp Image 2025-09-12 at 9.52.15 PM (1).jpeg"
+  },
+  {
+    "applicationId": "BIRTH-1768666323623",
+    "type": "BIRTH",
+    "data": {
+      "childName": "Shambhu",
+      "dob": "2025-11-01",
+      "placeOfBirth": "Sangamner",
+      "fatherName": "Vishal",
+      "motherName": "Swati",
+      "mobile": "7972277455"
+    },
+    "file": "1768666323618-1768661005316-Swati mscit.pdf",
+    "status": "APPROVED",
+    "date": "2026-01-17T16:12:03.623Z",
+    "submittedBy": "7972277455",
+    "remark": "ok found correct",
+    "certificateFile": "1768666763378-WhatsApp Image 2025-03-12 at 8.12.30 PM (1).jpeg"
+  },
+  {
+    "applicationId": "GRV-1768666449571",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "स्वाती कोल्हे ",
+      "department": "Garbage",
+      "description": "vcvcvccv",
+      "address": "गणेशनगर ",
+      "mobile": "7972277455"
+    },
+    "file": "1768666449566-1768665308014-WhatsApp Image 2025-09-12 at 9.52.15 PM (1).jpeg",
+    "status": "APPROVED",
+    "date": "2026-01-17T16:14:09.571Z",
+    "submittedBy": "7972277455",
+    "remark": "dcsdss",
+    "certificateFile": "1768669235320-1768666807942-1768661910398-home page (3).jpg"
+  },
+  {
+    "applicationId": "BIRTH-1768670193571",
+    "type": "BIRTH",
+    "data": {
+      "childName": "Viranssh",
+      "dob": "2023-04-01",
+      "placeOfBirth": "Sangamner",
+      "fatherName": "Vishal",
+      "motherName": "Swati",
+      "mobile": "7972277455"
+    },
+    "file": "1768670193305-TAIT RESULT Complete PDF.pdf",
+    "status": "APPROVED",
+    "date": "2026-01-17T17:16:33.571Z",
+    "submittedBy": "7972277455",
+    "remark": "ok",
+    "certificateFile": "1768670536978-1768669235320-1768666807942-1768661910398-home page (3).jpg"
+  },
+  {
+    "applicationId": "GRV-1768670277560",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "प्रयागा कोल्हे ",
+      "department": "Water",
+      "description": "पाणी येत नाही ",
+      "address": "गोल्देन किती ",
+      "mobile": "7972277455"
+    },
+    "file": "1768670277557-à¤ªà¤¾à¤µà¤¨à¤à¤¿à¤à¤¡ à¥¨.png",
+    "status": "APPROVED",
+    "date": "2026-01-17T17:17:57.560Z",
+    "submittedBy": "7972277455",
+    "remark": "ok found correct and neceddasry action will be taken"
+  },
+  {
+    "applicationId": "BIRTH-1768715217641",
+    "type": "BIRTH",
+    "data": {
+      "childName": "Viraj",
+      "dob": "2017-12-12",
+      "placeOfBirth": "sangamner",
+      "fatherName": "Mangesh",
+      "motherName": "Priyanka",
+      "mobile": "7972277455"
+    },
+    "file": "1768715217258-1768670193305-TAIT RESULT Complete PDF.pdf",
+    "status": "PENDING",
+    "date": "2026-01-18T05:46:57.641Z",
+    "submittedBy": "7972277455"
+  },
+  {
+    "applicationId": "DEATH-1768715273248",
+    "type": "DEATH",
+    "data": {
+      "deceasedName": "Ashalata",
+      "dod": "2000-02-19",
+      "placeOfDeath": "sangamner",
+      "causeOfDeath": "Illness",
+      "mobile": "7972277455"
+    },
+    "file": "1768715272950-1768670193305-TAIT RESULT Complete PDF.pdf",
+    "status": "PENDING",
+    "date": "2026-01-18T05:47:53.248Z",
+    "submittedBy": "7972277455"
+  },
+  {
+    "applicationId": "GRV-1768715634570",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "Viraj Ghodekar",
+      "department": "Roads",
+      "description": "घरासमोरील रस्त्यावर खड्डे पडलेले आहे.",
+      "address": "माळीवाडा",
+      "mobile": "7972277455"
+    },
+    "file": "1768715634303-1768670193305-TAIT RESULT Complete PDF.pdf",
+    "status": "APPROVED",
+    "date": "2026-01-18T05:53:54.570Z",
+    "submittedBy": "7972277455",
+    "remark": "ok",
+    "certificateFile": "1768715821448-1768670277557-Ã Â¤ÂªÃ Â¤Â¾Ã Â¤ÂµÃ Â¤Â¨Ã Â¤_Ã Â¤Â¿Ã Â¤_Ã Â¤Â¡ Ã Â¥Â¨.png"
+  },
+  {
+    "applicationId": "GRV-0001",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "प्रयागा कोल्हे ",
+      "department": "Road",
+      "description": "road not good",
+      "address": "गोल्देन किती ",
+      "mobile": "7972277455"
+    },
+    "file": "1768733901680-1768715821448-1768670277557-Ã Â¤ÂªÃ Â¤Â¾Ã Â¤ÂµÃ Â¤Â¨Ã Â¤_Ã Â¤Â¿Ã Â¤_Ã Â¤Â¡ Ã Â¥Â¨.png",
+    "status": "CLARIFICATION",
+    "date": "2026-01-18T10:58:21.684Z",
+    "submittedBy": "7972277455",
+    "remark": "ok"
+  },
+  {
+    "applicationId": "GRV-0002",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "Viraj Ghodekar",
+      "department": "Water",
+      "description": "fffdfdf",
+      "address": "dvf",
+      "mobile": "7972277455"
+    },
+    "file": "1768733930433-1768665126295-swatiaadhar.jpg",
+    "status": "PENDING",
+    "date": "2026-01-18T10:58:50.437Z",
+    "submittedBy": "7972277455"
+  },
+  {
+    "applicationId": "BIRTH-1768734025067",
+    "type": "BIRTH",
+    "data": {
+      "childName": "Viraj",
+      "dob": "2023-04-01",
+      "placeOfBirth": "Sangamner",
+      "fatherName": "amrut",
+      "motherName": "kajve",
+      "mobile": "7972277455"
+    },
+    "file": "1768734025022-QR Code (2).pdf",
+    "status": "PENDING",
+    "date": "2026-01-18T11:00:25.067Z",
+    "submittedBy": "7972277455"
+  },
+  {
+    "applicationId": "GRV-0003",
+    "type": "GRIEVANCE",
+    "data": {
+      "complainantName": "स्वाती कोल्हे ",
+      "department": "Water",
+      "description": "vgff",
+      "address": "fgfg",
+      "mobile": "7972277455"
+    },
+    "file": null,
+    "status": "REJECTED",
+    "date": "2026-01-18T11:21:56.318Z",
+    "submittedBy": "7972277455",
+    "transferHistory": [
+      {
+        "from": "vishal kolhe",
+        "fromDept": "Road",
+        "toDept": "Water",
+        "date": "2026-01-18T11:34:33.536Z",
+        "remark": "not of my department"
+      }
+    ],
+    "remark": "not "
+  }
+]

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_death">Death Certificate Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #fff0f0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #d32f2f;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #b71c1c;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 data-i18n="header_death">Apply Death Certificate</h1>
+        <form id="deathForm">
+            <label data-i18n="label_deceased_name">Deceased Name</label>
+            <input type="text" name="deceasedName" required>
+
+            <label data-i18n="label_dod">Date of Death</label>
+            <input type="date" name="dod" required>
+
+            <label data-i18n="label_pod">Place of Death</label>
+            <input type="text" name="placeOfDeath" required>
+
+            <label data-i18n="label_cause">Cause of Death</label>
+            <input type="text" name="causeOfDeath" required>
+
+            <label data-i18n="label_proof_death">Proof of Death (Doctor's Certificate)</label>
+            <input type="file" name="document" required accept=".pdf,.jpg,.jpeg,.png">
+
+            <button type="submit" class="btn" data-i18n="btn_submit_app">Submit Application</button>
+        </form>
+        <a href="dashboard.html" class="back" data-i18n="link_back_dashboard">Back to Dashboard</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        document.getElementById('deathForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Append User Mobile if logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.mobile) {
+                formData.append('mobile', user.mobile);
+            }
+
+            try {
+                const response = await fetch('/apply-death', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Application Submitted Successfully! Application ID: ' + result.applicationId);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Server Error');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

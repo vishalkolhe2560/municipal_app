@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_my_apps">My Applications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1a5fe0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f8ff;
+            color: #1a5fe0;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status.PENDING {
+            color: orange;
+        }
+
+        .status.APPROVED,
+        .status.RESOLVED {
+            color: green;
+        }
+
+        .status.REJECTED {
+            color: red;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #777;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body data-page="my_apps">
+
+    <div class="container">
+        <h1 data-i18n="header_my_apps">My Applications</h1>
+
+        <div id="loading" style="text-align:center;">Loading...</div>
+
+        <table id="appTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th data-i18n="th_app_id">App ID</th>
+                    <th data-i18n="th_type">Type</th>
+                    <th data-i18n="th_date">Date</th>
+                    <th data-i18n="th_status">Status</th>
+                    <th data-i18n="th_action">Action</th>
+                </tr>
+            </thead>
+            <tbody id="appBody">
+                <!-- Rows will be injected here -->
+            </tbody>
+        </table>
+
+        <div id="emptyMsg" class="empty-msg" style="display:none;" data-i18n="msg_no_apps">No applications found.</div>
+
+        <a href="dashboard.html" class="back" data-i18n="link_back_dashboard">Back to Dashboard</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.mobile) {
+                alert('Please login first');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/my-applications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mobile: user.mobile })
+                });
+                const result = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (result.success && result.apps.length > 0) {
+                    document.getElementById('appTable').style.display = 'table';
+                    const tbody = document.getElementById('appBody');
+
+                    result.apps.forEach(app => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${app.applicationId}</td>
+                            <td>${app.type}</td>
+                            <td>${new Date(app.date).toLocaleDateString()}</td>
+                            <td class="status ${app.status}">${app.status}</td>
+                            <td><button onclick="track('${app.applicationId}')" style="cursor:pointer;color:#1a5fe0;background:none;border:none;text-decoration:underline;">View</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('emptyMsg').style.display = 'block';
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Server Error');
+            }
+        });
+
+        function track(appId) {
+            // We can redirect to track_application.html and pre-fill the ID somehow, 
+            // OR just use localStorage to pass the ID if we want to be fancy.
+            // But track_application.html expects user input. 
+            // Let's modify track_application.html to check URL params or similar?
+            // A simple way is to copy to clipboard or just manual entry. 
+            // Better: Redirect with query param.
+
+            // For now, let's just alert the ID or redirect to track page with query param
+            window.location.href = `track_application.html?id=${appId}`;
+        }
+    </script>
+
+</body>
+
+</html>

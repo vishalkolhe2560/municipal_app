@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_track">Track Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #1a5fe0;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #144db8;
+        }
+
+        .result {
+            margin-top: 30px;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result p {
+            margin: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .result .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .back {
+            display: block;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 data-i18n="header_app_details">Application Details</h1>
+        <div id="searchContainer">
+            <input type="text" id="appId" placeholder="Enter Application ID" data-i18n="placeholder_app_id">
+            <button class="btn" onclick="track()" data-i18n="btn_track_status">Track Status</button>
+        </div>
+
+        <div id="result" class="result">
+            <p><span class="label" data-i18n="label_app_id">Application ID:</span> <span id="resId"></span></p>
+            <p><span class="label" data-i18n="label_type">Type:</span> <span id="resType"></span></p>
+            <p><span class="label" data-i18n="label_date">Date:</span> <span id="resDate"></span></p>
+
+            <!-- Application Data -->
+            <div id="detailsSection"
+                style="margin: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0;">
+                <!-- Filled via JS -->
+            </div>
+
+            <p><span class="label" data-i18n="label_status">Status:</span> <span id="resStatus"
+                    style="font-weight: bold;"></span></p>
+            <p id="remarkSection" style="display:none;"><span class="label" data-i18n="label_remark">Officer
+                    Remark:</span> <span id="resRemark" style="color:red;"></span></p>
+            <div id="downloadSection" style="display:none; margin-top:15px;">
+                <a id="downloadLink" href="#" class="btn"
+                    style="background:green; text-decoration:none; display:inline-block;"
+                    data-i18n="btn_download_cert">Download Certificate</a>
+            </div>
+        </div>
+
+        <a href="dashboard.html" class="back" data-i18n="link_back_dashboard">Back to Dashboard</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (id) {
+                document.getElementById('appId').value = id;
+                document.getElementById('searchContainer').style.display = 'none';
+                // Optional: Update header to be more specific or keep as is? 
+                // User said "remove earlier thing like track application button textbox and label"
+                // They didn't explicitly say remove header, but "Track Application" header is fine.
+                track();
+            }
+        });
+
+        async function track() {
+            const appId = document.getElementById('appId').value.trim();
+            if (!appId) { alert("Please enter Application ID"); return; }
+
+            try {
+                const response = await fetch('/track-application', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ applicationId: appId })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('result').style.display = 'block';
+                    const app = data.data;
+                    document.getElementById('resId').innerText = app.applicationId;
+                    document.getElementById('resType').innerText = app.type;
+                    document.getElementById('resDate').innerText = new Date(app.date).toLocaleDateString();
+
+                    // Show Submitted Details
+                    const detailsSection = document.getElementById('detailsSection');
+                    let detailsHtml = '<h3 style="margin:0 0 10px 0; font-size:16px; color:#1a5fe0;">Submitted Details</h3>';
+                    for (const [key, val] of Object.entries(app.data)) {
+                        // Optional: Filter out mobile if we don't want to show it, or format keys
+                        if (key !== 'mobile') {
+                            detailsHtml += `<p style="margin:5px 0;"><span class="label" style="text-transform:capitalize;">${key.replace(/([A-Z])/g, ' $1').trim()}:</span> ${val}</p>`;
+                        }
+                    }
+                    detailsSection.innerHTML = detailsHtml;
+
+                    // Show Transfer History
+                    if (app.transferHistory && app.transferHistory.length > 0) {
+                        let historyHtml = '<div style="margin: 15px 0; background: #f0f7ff; padding: 10px; border-radius: 8px; border: 1px solid #d0e1f7;">';
+                        historyHtml += '<h3 style="margin: 0 0 10px 0; font-size: 15px; color: #1a5fe0;">Application Forwarding History</h3>';
+                        app.transferHistory.forEach(h => {
+                            historyHtml += `
+                                <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; font-size: 13px;">
+                                    <strong>Forwarded From:</strong> ${h.from} (${h.fromDept})<br>
+                                    <strong>To Department:</strong> ${h.toDept}<br>
+                                    <strong>Date:</strong> ${new Date(h.date).toLocaleDateString()}<br>
+                                    <span style="font-style:italic;">"${h.remark}"</span>
+                                </div>
+                            `;
+                        });
+                        historyHtml += '</div>';
+                        detailsSection.insertAdjacentHTML('afterend', historyHtml);
+                    }
+
+                    const statusEl = document.getElementById('resStatus');
+                    statusEl.innerText = app.status;
+                    statusEl.style.color = app.status === 'APPROVED' ? 'green' : (app.status === 'REJECTED' ? 'red' : 'orange');
+
+                    // Show Remarks if available
+                    if (app.remark) {
+                        document.getElementById('remarkSection').style.display = 'block';
+                        document.getElementById('resRemark').innerText = app.remark;
+                    } else {
+                        document.getElementById('remarkSection').style.display = 'none';
+                    }
+
+                    // Show Download if Approved & File exists
+                    if (app.status === 'APPROVED' && app.certificateFile) {
+                        document.getElementById('downloadSection').style.display = 'block';
+                        const link = document.getElementById('downloadLink');
+                        link.href = '/download/' + app.certificateFile;
+
+                        // Change Label for Grievance
+                        if (app.type === 'GRIEVANCE') {
+                            link.innerText = getTranslation('btn_view_response');
+                            link.setAttribute('data-i18n', 'btn_view_response');
+                        } else {
+                            link.innerText = getTranslation('btn_download_cert');
+                            link.setAttribute('data-i18n', 'btn_download_cert');
+                        }
+
+                    } else {
+                        document.getElementById('downloadSection').style.display = 'none';
+                    }
+
+                    // Clarification Reply Section
+                    if (app.status === 'CLARIFICATION') {
+                        let replyHtml = `
+                            <div id="replySection" style="margin-top: 20px; text-align: left; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
+                                <h3 style="color: #856404; margin-top: 0;">Reply to Clarification</h3>
+                                <p style="font-size: 14px; color: #856404;">The officer has requested clarification. Please provide your response below.</p>
+                                
+                                <label style="font-weight: bold; display: block; margin-top: 10px;">Your Opinion/Explanation:</label>
+                                <textarea id="replyOpinion" style="width: 100%; height: 80px; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;" placeholder="Enter your explanation here..."></textarea>
+                                
+                                <label style="font-weight: bold; display: block; margin-top: 10px;">Supporting Document (Optional):</label>
+                                <input type="file" id="replyFile" style="width: 100%; padding: 10px; background: white; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; box-sizing: border-box;">
+                                
+                                <button onclick="submitReply('${app.applicationId}')" style="background: #ffc107; color: black; border: none; padding: 10px 20px; margin-top: 15px; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%;">Submit Reply</button>
+                            </div>
+                        `;
+                        // Insert after remarks
+                        document.getElementById('remarkSection').insertAdjacentHTML('afterend', replyHtml);
+                    } else if (app.status === 'CLARIFICATION_SUBMITTED') {
+                        let submittedHtml = `
+                            <div style="margin-top: 20px; text-align: left; background: #d4edda; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb;">
+                                <h3 style="color: #155724; margin-top: 0;">Clarification Submitted</h3>
+                                <p style="color: #155724;">You have successfully submitted your response. Please wait for further updates.</p>
+                            </div>
+                         `;
+                        document.getElementById('remarkSection').insertAdjacentHTML('afterend', submittedHtml);
+                    }
+                } else {
+                    document.getElementById('result').style.display = 'none';
+                    alert('Application not found');
+                }
+            } catch (e) {
+                alert('Server Error');
+            }
+        }
+        async function submitReply(appId) {
+            const opinion = document.getElementById('replyOpinion').value;
+            const fileInput = document.getElementById('replyFile');
+            const file = fileInput.files[0];
+
+            if (!opinion.trim()) {
+                alert("Please enter your opinion/explanation.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('applicationId', appId);
+            formData.append('opinion', opinion);
+            if (file) {
+                formData.append('clarificationDoc', file);
+            }
+
+            try {
+                const response = await fetch('/reply-clarification', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Reply Submitted Successfully!");
+                    window.location.reload();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Server Error");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1768638040583,
+    "name": "Browser Test User",
+    "mobile": "9876543210",
+    "email": "test@example.com",
+    "password": "password123"
+  },
+  {
+    "id": 1768638326342,
+    "name": "Vishal Kolhe",
+    "mobile": "9822410935",
+    "email": "",
+    "password": "Vishal@92"
+  },
+  {
+    "id": 1768638523667,
+    "name": "swati pokale",
+    "mobile": "7972277455",
+    "email": "",
+    "password": "vishal123"
+  }
+]

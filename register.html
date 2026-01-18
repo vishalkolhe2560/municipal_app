@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_register">Register - e-Municipal Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(180deg, #64a8ff, #e3f2fd);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 360px;
+            background: #f5f8ff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            color: #1a4fb3;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #cfd9ff;
+            font-size: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 15px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .link {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #1a5fe0;
+            text-decoration: none;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 data-i18n="header_register">New User Registration</h1>
+
+        <input type="text" id="name" class="input-box" placeholder="Full Name" data-i18n="placeholder_fullname">
+        <input type="text" id="mobile" class="input-box" placeholder="Mobile Number" data-i18n="placeholder_mobile">
+        <input type="email" id="email" class="input-box" placeholder="Email (Optional)" data-i18n="placeholder_email">
+        <input type="password" id="password" class="input-box" placeholder="Password" data-i18n="placeholder_password">
+        <input type="password" id="confirm" class="input-box" placeholder="Confirm Password"
+            data-i18n="placeholder_confirm_pass">
+
+        <button class="btn" onclick="register()" data-i18n="btn_register">REGISTER</button>
+
+        <a href="index.html" class="link" data-i18n="link_back_login">Back to Login</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        function register() {
+            let name = document.getElementById("name").value;
+            let mobile = document.getElementById("mobile").value;
+            let email = document.getElementById("email").value;
+            let pass = document.getElementById("password").value;
+            let confirm = document.getElementById("confirm").value;
+
+            if (!name || !mobile || !pass || !confirm) {
+                alert("Please fill all required fields");
+                return;
+            }
+            if (pass !== confirm) {
+                alert("Passwords do not match");
+                return;
+            }
+
+            // API call example
+            fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name, mobile, email, password: pass
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Registration Successful!");
+                    window.location.href = "index.html";
+                })
+                .catch(err => alert("Server Error"));
+        }
+    </script>
+
+</body>
+
+</html>

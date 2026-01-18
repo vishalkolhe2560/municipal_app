@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Manage Officers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            padding: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Forms */
+        .form-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-panel h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #144db8;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: #ff9800;
+        }
+
+        .btn-delete {
+            background: #f44336;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Admin Dashboard</h2>
+        <button onclick="logout()" style="background:none; border:1px solid white;">Logout</button>
+    </div>
+
+    <div class="container">
+
+        <!-- Add Officer Form -->
+        <div class="form-panel">
+            <h3>Add / Update Officer</h3>
+            <input type="hidden" id="officerId">
+            <div class="row">
+                <input type="text" id="name" placeholder="Full Name">
+                <input type="text" id="username" placeholder="Username">
+            </div>
+            <div style="margin-top:15px;">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+
+            <div style="margin-top:15px;">
+                <label style="font-weight:600; display:block; margin-bottom:5px;">Assigned Rights:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" class="right-chk" value="BIRTH"> Birth Cert.</label>
+                    <label><input type="checkbox" class="right-chk" value="DEATH"> Death Cert.</label>
+                    <label><input type="checkbox" class="right-chk" value="GRIEVANCE" onchange="toggleDeptInput()">
+                        Grievances</label>
+                </div>
+            </div>
+
+            <div style="margin-top:15px; display:none;" id="deptContainer">
+                <label style="font-weight:600; display:block; margin-bottom:5px;">Department (e.g. Roads,
+                    Water):</label>
+                <input type="text" id="officerDept" placeholder="Enter Department Name" list="deptSuggestions">
+                <datalist id="deptSuggestions">
+                    <!-- Populated dynamically if needed, or leave empty -->
+                </datalist>
+            </div>
+
+            <div style="margin-top:20px;">
+                <button onclick="saveOfficer()">Save Officer</button>
+                <button onclick="resetForm()" style="background:#777; margin-left:10px;">Reset</button>
+            </div>
+        </div>
+
+        <!-- Officer List -->
+        <h3>Existing Officers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Rights</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="officerTable">
+                <!-- Data loaded via JS -->
+            </tbody>
+        </table>
+
+    </div>
+
+    <script>
+        async function loadOfficers() {
+            try {
+                const res = await fetch('/admin/officers');
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('officerTable');
+                    tbody.innerHTML = '';
+                    data.officers.forEach(off => {
+                        if (off.username === 'admin') return; // Hide superadmin
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${off.name}</td>
+                                <td>${off.username}</td>
+                                <td>${off.rights ? off.rights.join(', ') : 'None'}</td>
+                                <td>${off.department || '-'}</td>
+                                <td>
+                                    <button class="btn-small btn-edit" onclick='editOfficer(${JSON.stringify(off)})'>Edit</button>
+                                    <button class="btn-small btn-delete" onclick='deleteOfficer(${off.id})'>Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function saveOfficer() {
+            const id = document.getElementById('officerId').value;
+            const name = document.getElementById('name').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const department = document.getElementById('officerDept').value;
+
+            const rights = [];
+            document.querySelectorAll('.right-chk:checked').forEach(c => rights.push(c.value));
+
+            if (!name || !username || (rights.length === 0)) {
+                alert("Please fill all fields and select at least one right");
+                return;
+            }
+
+            const endpoint = id ? '/admin/update-officer' : '/admin/add-officer';
+            const body = { id, name, username, password, rights, department };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert("Saved Successfully");
+                    resetForm();
+                    loadOfficers();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (e) {
+                alert("Server Error");
+            }
+        }
+
+        async function deleteOfficer(id) {
+            if (!confirm("Are you sure?")) return;
+            await fetch('/admin/delete-officer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            loadOfficers();
+        }
+
+        function toggleDeptInput() {
+            const grievanceChk = document.querySelector('input[value="GRIEVANCE"]');
+            const deptContainer = document.getElementById('deptContainer');
+            if (grievanceChk.checked) {
+                deptContainer.style.display = 'block';
+            } else {
+                deptContainer.style.display = 'none';
+                document.getElementById('officerDept').value = ''; // Clear if unchecked
+            }
+        }
+
+        // Fetch existing Depertments for suggestions (Optional UX)
+        async function loadDeptSuggestions() {
+            try {
+                const res = await fetch('/departments');
+                const data = await res.json();
+                if (data.success && data.departments) {
+                    const dl = document.getElementById('deptSuggestions');
+                    dl.innerHTML = '';
+                    data.departments.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.name;
+                        dl.appendChild(opt);
+                    });
+                }
+            } catch (e) { }
+        }
+
+        function editOfficer(officer) {
+            document.getElementById('officerId').value = officer.id;
+            document.getElementById('name').value = officer.name;
+            document.getElementById('username').value = officer.username;
+            document.getElementById('username').disabled = true; // Cannot change username
+            document.getElementById('password').value = officer.password;
+
+            // Set Checkboxes
+            document.querySelectorAll('.right-chk').forEach(chk => {
+                chk.checked = officer.rights.includes(chk.value);
+            });
+
+            // Set Department
+            document.getElementById('officerDept').value = officer.department || "";
+
+            // Trigger Toggle
+            toggleDeptInput();
+        }
+
+        function resetForm() {
+            document.getElementById('officerId').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('username').disabled = false;
+            document.getElementById('password').value = '';
+            document.getElementById('officerDept').value = '';
+            document.querySelectorAll('.right-chk').forEach(c => c.checked = false);
+            toggleDeptInput();
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        loadOfficers();
+        loadDeptSuggestions();
+    </script>
+
+</body>
+
+</html>

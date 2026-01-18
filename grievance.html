@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_grievance">Lodge Grievance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1a5fe0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1a5fe0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #144db8;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .custom-file-upload {
+            border: 1px dashed #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body data-page="grievance">
+
+    <div class="container">
+        <h1 data-i18n="header_grievance">Lodge Grievance</h1>
+        <form id="grievanceForm">
+            <label data-i18n="label_complainant_name">Complainant Name</label>
+            <input type="text" name="complainantName" required>
+
+            <label data-i18n="label_department">Department</label>
+            <select name="department" id="deptSelect" required>
+                <option value="" data-i18n="option_select_dept">Select Department</option>
+                <!-- Loaded dynamically -->
+            </select>
+
+            <label data-i18n="label_description">Complaint Description</label>
+            <textarea name="description" rows="4" required></textarea>
+
+            <label data-i18n="label_address">Location/Address</label>
+            <input type="text" name="address" required>
+
+            <label data-i18n="label_photo">Upload Photo (Optional)</label>
+            <input type="file" name="document" accept="image/*,application/pdf">
+
+            <button type="submit" data-i18n="btn_submit_grievance">Lodge Grievance</button>
+        </form>
+        <a href="dashboard.html" class="back" data-i18n="link_back_dashboard">Back to Dashboard</a>
+    </div>
+    <script src="translations.js"></script>
+
+    <script>
+        document.getElementById('grievanceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            // Append User Mobile if logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.mobile) {
+                formData.append('mobile', user.mobile);
+            }
+
+            try {
+                const response = await fetch('/lodge-grievance', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(getTranslation('msg_grievance_submitted') + result.applicationId); // Using getTranslation helper
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(getTranslation('msg_server_error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(getTranslation('msg_server_error'));
+            }
+        });
+
+        // Load Departments
+        async function loadDepartments() {
+            try {
+                const res = await fetch('/departments');
+                const data = await res.json();
+                if (data.success) {
+                    const select = document.getElementById('deptSelect');
+                    // Clear existing options except first
+                    const first = select.firstElementChild;
+                    select.innerHTML = '';
+                    select.appendChild(first);
+
+                    data.departments.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.name;
+                        opt.innerText = d.name;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        loadDepartments();
+    </script>
+
+</body>
+
+</html>

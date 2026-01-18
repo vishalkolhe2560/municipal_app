@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title_dashboard">Dashboard - e-Municipal Services</title>
+    <meta name="viewport" content="width=device-width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .header {
+            background: #1a5fe0;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1a5fe0;
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin: 0 20px 20px 20px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .panel h3 {
+            margin-top: 0;
+            color: #1a5fe0;
+            border-bottom: 2px solid #eef3ff;
+            padding-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f5f8ff;
+            color: #1a5fe0;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status.PENDING {
+            color: orange;
+        }
+
+        .status.APPROVED,
+        .status.RESOLVED {
+            color: green;
+        }
+
+        .status.REJECTED {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span data-i18n="header_citizen_dashboard">Citizen Dashboard</span>
+        <div class="header-right" style="display: flex; align-items: center;">
+            <button onclick="logout()"
+                style="background: none; border: 1px solid white; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 14px;"
+                data-i18n="link_logout">Logout</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card" onclick="window.location.href='birth_certificate.html'" data-i18n="card_birth">Apply Birth
+            Certificate</div>
+        <div class="card" onclick="window.location.href='death_certificate.html'" data-i18n="card_death">Apply Death
+            Certificate</div>
+        <div class="card" onclick="window.open('https://mahaulb.in/MahaULB/property/propertyOnlinePay', '_blank')"
+            data-i18n="card_property">Pay
+            Property Tax</div>
+        <div class="card" onclick="window.open('https://mahaulb.in/MahaULB/water/showServicePage/payMyDues', '_blank')"
+            data-i18n="card_water">
+            Pay Water Tax</div>
+        <div class="card" onclick="window.location.href='grievance.html'" data-i18n="card_grievance">Lodge Grievance
+        </div>
+
+    </div>
+
+    <!-- My Applications Panel -->
+    <div class="panel">
+        <h3 data-i18n="header_my_apps">My Applications</h3>
+        <div id="loading" style="color:#666;">Loading...</div>
+        <table id="appTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th data-i18n="th_app_id">App ID</th>
+                    <th data-i18n="th_type">Type</th>
+                    <th data-i18n="th_date">Date</th>
+                    <th data-i18n="th_status">Status</th>
+                    <th data-i18n="th_action">Action</th>
+                </tr>
+            </thead>
+            <tbody id="appBody"></tbody>
+        </table>
+        <div id="emptyMsg" style="display:none; color:#777; margin-top:10px;" data-i18n="msg_no_apps">No applications
+            found.</div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script>
+        function logout() {
+            // clear any session data if needed
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.mobile) {
+                // Not logged in or no mobile, maybe redirect or just hide panel
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch('/my-applications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mobile: user.mobile })
+                });
+                const result = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (result.success && result.apps.length > 0) {
+                    document.getElementById('appTable').style.display = 'table';
+                    const tbody = document.getElementById('appBody');
+
+                    result.apps.forEach(app => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${app.applicationId}</td>
+                            <td>${app.type}</td>
+                            <td>${new Date(app.date).toLocaleDateString()}</td>
+                            <td class="status ${app.status}">${app.status}</td>
+                            <td><button onclick="window.location.href='track_application.html?id=${app.applicationId}'" style="cursor:pointer;color:#1a5fe0;background:none;border:none;text-decoration:underline;">View</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('emptyMsg').style.display = 'block';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loading').innerText = 'Error loading applications';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

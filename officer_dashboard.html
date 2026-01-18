@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Officer Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3ff;
+        }
+
+        .header {
+            background: #1a5fe0;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            padding: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        th,
+        td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #1a5fe0;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-view {
+            background: #1a5fe0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 35px;
+            border-radius: 24px;
+            width: 550px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            color: #1a5fe0;
+            border-bottom: 2px solid #eef3ff;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            font-weight: 600;
+            color: #7a8db8;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .field span {
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .actions {
+            margin-top: 25px;
+            border-top: 1px solid #eef3ff;
+            padding-top: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 15px;
+            border: 2px solid #eef3ff;
+            border-radius: 12px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #1a5fe0;
+        }
+
+        .btn-action {
+            width: 32%;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+
+        .btn-approve {
+            background: #00c853;
+        }
+
+        .btn-reject {
+            background: #ff3d00;
+        }
+
+        .btn-clarify {
+            background: #ff9100;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f5f8ff;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Officer Dashboard</h2>
+        <div class="header-right" style="display: flex; align-items: center;">
+            <a href="index.html" style="color:white; text-decoration:none;">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>App ID</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Rows loaded via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2>Application Details</h2>
+            <div id="modalDetails"></div>
+
+            <div class="field">
+                <label>Applicant Document</label>
+                <a id="docLink" href="#" target="_blank" style="color:#3498db;">View Uploaded Document</a>
+            </div>
+
+            <div class="actions">
+                <h3>Update Status</h3>
+                <textarea id="remarks" placeholder="Enter remarks (required for Rejection/Clarification)"></textarea>
+
+                <div id="uploadSection"
+                    style="display:none; background: #e8f5e9; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    <label data-i18n="label_upload_cert">Upload Generated Certificate/Response (Optional):</label>
+                    <input type="file" id="certFile">
+                </div>
+
+                <div style="display:flex; justify-content: space-between;">
+                    <button class="btn btn-action btn-reject" onclick="updateStatus('REJECTED')">Reject</button>
+                    <button class="btn btn-action btn-clarify" onclick="updateStatus('CLARIFICATION')">Req.
+                        Clarification</button>
+                    <button class="btn btn-action" style="background:#607d8b;" onclick="forwardApp()">Forward</button>
+                    <button class="btn btn-action btn-approve" onclick="showUpload()">Approve</button>
+                </div>
+
+                <!-- Forward Section -->
+                <div id="forwardSection"
+                    style="display:none; margin-top:15px; background:#e0f7fa; padding:15px; border-radius:8px;">
+                    <h4 style="margin-top:0;">Forward Application</h4>
+                    <label>Select Target Department:</label>
+                    <select id="targetDept" style="width:100%; padding:8px; margin-bottom:10px;">
+                        <option>Loading...</option>
+                    </select>
+                    <label>Reason for Forwarding:</label>
+                    <textarea id="forwardRemark" style="height:50px; margin-bottom:10px;"
+                        placeholder="Why are you forwarding this?"></textarea>
+                    <button onclick="confirmForward()"
+                        style="width:100%; background:#0097a7; color:white; border:none; padding:10px; border-radius:4px; font-weight:bold; cursor:pointer;">Confirm
+                        Forward</button>
+                </div>
+
+                <!-- Second step for Approval (Submit with file) -->
+                <button id="finalApproveBtn" class="btn btn-action btn-approve"
+                    style="width:100%; margin-top:10px; display:none;" onclick="updateStatus('APPROVED')">Confirm
+                    Approval & Upload</button>
+            </div>
+
+            <button onclick="closeModal()"
+                style="margin-top:20px; background: none; border: 1px solid #ccc; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer;">Close</button>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script>
+        let currentAppId = null;
+
+        // Load Applications
+        async function loadApps() {
+            const officer = JSON.parse(localStorage.getItem('officer'));
+            if (!officer || !officer.username) {
+                alert('Session expired. Please login again.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const res = await fetch('/officer/applications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: officer.username })
+            });
+            const data = await res.json();
+            console.log("Apps received:", data); // Debug
+
+            if (data.apps.length === 0) {
+                // alert("No applications found for " + officer.username);
+                console.log("No apps found");
+            }
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.apps.forEach(app => {
+                tbody.innerHTML += `
+            <tr>
+                <td>${app.applicationId}</td>
+                <td>${app.type}</td>
+                <td>${new Date(app.date).toLocaleDateString()}</td>
+                <td style="font-weight:bold; color: ${getStatusColor(app.status)}">${app.status}</td>
+                <td><button class="btn btn-view" onclick='viewApp(${JSON.stringify(app)})'>View</button></td>
+            </tr>
+        `;
+            });
+        }
+
+        function getStatusColor(status) {
+            if (status === 'APPROVED') return 'green';
+            if (status === 'REJECTED') return 'red';
+            if (status === 'CLARIFICATION') return 'orange';
+            if (status === 'CLARIFICATION_SUBMITTED') return '#9c27b0'; // Purple
+            return '#555';
+        }
+
+        function viewApp(app) {
+            currentAppId = app.applicationId;
+            const details = document.getElementById('modalDetails');
+            let html = '';
+            for (const [key, val] of Object.entries(app.data)) {
+                html += `<div class="field"><label>${key}</label><span>${val}</span></div>`;
+            }
+
+            // Show Clarification Reply if Exists
+            if (app.clarificationReply) {
+                html += `
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e1bee7;">
+                        <h3 style="color: #6a1b9a; margin-top: 0;">Citizen Reply to Clarification</h3>
+                        <div class="field">
+                            <label style="color: #6a1b9a;">Opinion/Explanation</label>
+                            <span style="display:block; margin-top:5px;">${app.clarificationReply.opinion}</span>
+                        </div>
+                        ${app.clarificationReply.file ? `<div class="field"><label style="color: #6a1b9a;">Supporting Document</label><a href="/download/${app.clarificationReply.file}" target="_blank" style="color: #8e24aa; font-weight: bold;">View Document</a></div>` : ''}
+                        <div class="field"><label style="color: #6a1b9a;">Submitted Date</label><span>${new Date(app.clarificationReply.date).toLocaleString()}</span></div>
+                    </div>
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                 `;
+            }
+
+            details.innerHTML = html;
+
+            const docLink = document.getElementById('docLink');
+            if (app.file) {
+                docLink.href = '/download/' + app.file;
+                docLink.style.display = 'inline-block';
+                docLink.innerText = 'View Uploaded Document';
+                docLink.style.pointerEvents = 'auto';
+                docLink.style.color = '#3498db';
+                docLink.parentElement.style.display = 'block';
+            } else {
+                docLink.href = '#';
+                docLink.innerText = 'No Document Uploaded';
+                docLink.style.display = 'inline-block';
+                docLink.style.color = '#999';
+                docLink.style.pointerEvents = 'none';
+                docLink.parentElement.style.display = 'block';
+            }
+
+            document.getElementById('remarks').value = app.remark || '';
+
+            // Show Existing Certificate/Response
+            const existingCertSection = document.getElementById('existingCertSection');
+            if (app.certificateFile) {
+                if (!existingCertSection) {
+                    // Create if not exists
+                    const div = document.createElement('div');
+                    div.id = 'existingCertSection';
+                    div.className = 'field';
+                    div.innerHTML = `<label>Previously Uploaded Response/Certificate</label><a id="certLink" href="#" target="_blank" style="color:#27ae60; font-weight:bold;">View Upload</a>`;
+                    document.getElementById('docLink').parentElement.after(div);
+                }
+                document.getElementById('existingCertSection').style.display = 'block';
+                document.getElementById('certLink').href = '/download/' + app.certificateFile;
+            } else {
+                if (existingCertSection) existingCertSection.style.display = 'none';
+            }
+
+            // Reset UI
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('finalApproveBtn').style.display = 'none';
+            document.getElementById('forwardSection').style.display = 'none';
+            // display transfer history
+            if (app.transferHistory && app.transferHistory.length > 0) {
+                let historyHtml = '<div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;"><h3>Transfer History</h3>';
+                app.transferHistory.forEach(h => {
+                    historyHtml += `
+                        <div style="background:#f9f9f9; padding:10px; margin-bottom:5px; font-size:13px; border-left: 3px solid #607d8b;">
+                            <strong>From:</strong> ${h.from} (${h.fromDept}) <br>
+                            <strong>To:</strong> ${h.toDept} <br>
+                            <strong>Date:</strong> ${new Date(h.date).toLocaleString()} <br>
+                            <strong>Remark:</strong> ${h.remark}
+                        </div>
+                    `;
+                });
+                historyHtml += '</div>';
+
+                // details is defined earlier in viewApp
+                const details = document.getElementById('modalDetails');
+                details.insertAdjacentHTML('beforeend', historyHtml);
+            }
+
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function showUpload() {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('finalApproveBtn').style.display = 'block';
+        }
+
+        async function updateStatus(status) {
+            const remark = document.getElementById('remarks').value;
+            const certFile = document.getElementById('certFile').files[0];
+
+            if ((status === 'REJECTED' || status === 'CLARIFICATION') && !remark.trim()) {
+                alert("Please enter a remark for this action.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('applicationId', currentAppId);
+            formData.append('status', status);
+            formData.append('remark', remark);
+            if (certFile) formData.append('certificate', certFile);
+
+            try {
+                const res = await fetch('/officer/update-status', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert("Status Updated!");
+                    closeModal();
+                    loadApps();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (e) {
+                alert("Server Error");
+            }
+        }
+
+        // Forwarding Logic
+        async function forwardApp() {
+            // Show Forward Modal (reuse or new? Let's use prompt for simple now, or better a hidden div)
+            // Existing modal is complex. Let's toggle a "Forward Section" in the modal.
+
+            const forwardSection = document.getElementById('forwardSection');
+            if (forwardSection.style.display === 'none') {
+                forwardSection.style.display = 'block';
+                // Load Departments
+                const res = await fetch('/departments');
+                const data = await res.json();
+                const select = document.getElementById('targetDept');
+                select.innerHTML = '<option value="">Select Department</option>';
+                data.departments.forEach(d => {
+                    select.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+                });
+            } else {
+                forwardSection.style.display = 'none';
+            }
+        }
+
+        async function confirmForward() {
+            const targetDept = document.getElementById('targetDept').value;
+            const remark = document.getElementById('forwardRemark').value;
+            const officer = JSON.parse(localStorage.getItem('officer'));
+
+            if (!targetDept || !remark) {
+                alert("Please select department and enter remark");
+                return;
+            }
+
+            if (confirm(`Are you sure you want to forward this to ${targetDept}?`)) {
+                try {
+                    const res = await fetch('/officer/forward-grievance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            applicationId: currentAppId,
+                            targetDepartment: targetDept,
+                            remark: remark,
+                            fromOfficerUsername: officer.username
+                        })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert("Application Forwarded!");
+                        closeModal();
+                        loadApps();
+                    } else {
+                        alert("Error: " + result.message);
+                    }
+                } catch (e) {
+                    alert("Server Error");
+                }
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        loadApps();
+    </script>
+
+</body>
+
+</html>

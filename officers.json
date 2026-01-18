@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1768733749730,
+    "username": "road",
+    "password": "pass123",
+    "name": "vishal kolhe",
+    "rights": [
+      "GRIEVANCE"
+    ],
+    "department": "Road"
+  },
+  {
+    "id": 1768733816229,
+    "username": "Water",
+    "password": "pass123",
+    "name": "Amrut Kajve",
+    "rights": [
+      "GRIEVANCE"
+    ],
+    "department": "Water"
+  },
+  {
+    "id": 1768733855555,
+    "username": "co",
+    "password": "co123",
+    "name": "Chief Officer",
+    "rights": [
+      "BIRTH",
+      "DEATH",
+      "GRIEVANCE"
+    ],
+    "department": null
+  }
+]
